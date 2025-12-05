@@ -1,6 +1,42 @@
 /* Code Forge - Obsidian Plugin Styles */
 
 /* ==========================================================================
+   Shiki Highlighted Code Blocks
+   ========================================================================== */
+
+/*
+ * Shiki uses inline styles (style="color: #xxx") on span elements.
+ * We need to ensure these are NOT overridden by theme CSS.
+ * DO NOT set color or background-color here - let Shiki's inline styles win.
+ */
+
+/* Base pre styling */
+pre.code-forge-highlighted {
+  padding: 1em;
+  border-radius: var(--radius-m);
+  overflow-x: auto;
+  margin: 1em 0;
+}
+
+/* Reset code element - let pre's background show through */
+pre.code-forge-highlighted code {
+  background: transparent;
+  padding: 0;
+  font-family: var(--font-monospace);
+  font-size: var(--font-smaller);
+  line-height: var(--line-height-tight);
+}
+
+/*
+ * CRITICAL: Override any theme rules that set colors on code spans
+ * By using all:revert, we reset theme styles and let inline styles apply
+ */
+pre.code-forge-highlighted code span {
+  color: unset;
+  background: unset;
+}
+
+/* ==========================================================================
    Code Block Container
    ========================================================================== */
 

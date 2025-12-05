@@ -20,7 +20,7 @@ export default class CodeForgePlugin extends Plugin {
 
     // Register markdown post processor for syntax highlighting in Reading view
     this.registerMarkdownPostProcessor(
-      createShikiPostProcessor(this.shikiEngine)
+      createShikiPostProcessor(this.shikiEngine, this.settings.debugMode)
     );
 
     // TODO: Phase 2 - Register editor extensions for multi-mode support

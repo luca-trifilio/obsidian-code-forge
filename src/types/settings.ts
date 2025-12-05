@@ -124,7 +124,7 @@ export const DEFAULT_SETTINGS: CodeForgeSettings = {
 
   // Theme
   themeSource: "auto",
-  bundledTheme: "github-dark",
+  bundledTheme: "dracula",
   themeDark: "github-dark",
   themeLight: "github-light",
   autoSyncTheme: true,
