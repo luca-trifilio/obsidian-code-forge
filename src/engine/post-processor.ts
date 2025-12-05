@@ -12,6 +12,11 @@ export function createShikiPostProcessor(engine: ShikiEngine, debug = false) {
     el: HTMLElement,
     _ctx: MarkdownPostProcessorContext
   ): Promise<void> => {
+    // Skip frontmatter blocks - they or their ancestors have class "mod-frontmatter"
+    if (el.classList.contains("mod-frontmatter") || el.closest(".mod-frontmatter")) {
+      return;
+    }
+
     // Find all code blocks in the element
     const codeBlocks = el.querySelectorAll("pre > code");
 

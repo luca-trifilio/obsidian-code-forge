@@ -86,7 +86,29 @@ ruby, swift, kotlin, sql, html, css, json, yaml, markdown, bash
 1. Aggiunto CSS per `pre.code-forge-highlighted`
 2. Reset colori con `color: unset` su spans
 
-**Status:** In corso - testing CSS fix
+**Status:** ✅ Risolto
+
+---
+
+### Sessione 4: Finalizzazione Fase 1
+
+**Completato:**
+- [x] Verificato CSS fix funzionante - inline styles Shiki hanno precedenza
+- [x] Rimosso debug logging dal PostProcessor
+- [x] Cambiato tema default da `github-dark` a `dracula`
+- [x] Aggiornato test per nuovo tema default
+- [x] Fix bug: frontmatter YAML duplicato in Reading view
+  - Causa: PostProcessor processava anche il frontmatter
+  - Fix: Skip elementi con classe `mod-frontmatter` o ancestor con quella classe
+- [x] Build e test passano (28 test)
+- [x] Commit e push su `feature/shiki-engine`
+
+**Bug fix applicati:**
+- `post-processor.ts`: Aggiunto check `el.closest(".mod-frontmatter")` per escludere frontmatter
+
+**Da fare:**
+- [ ] Creare PR con label `release:minor`
+- [ ] Merge su main
 
 ---
 
@@ -130,9 +152,9 @@ Soluzione: usare `color: unset` per resettare le regole del tema.
 ## Prossimi Passi
 
 ### Da completare (Fase 1)
-- [ ] Risolvere CSS conflict con tema Baseline
+- [x] Risolvere CSS conflict con tema Baseline
 - [ ] Testare con altri temi
-- [ ] Rimuovere debug logging
+- [x] Rimuovere debug logging
 - [ ] Merge PR con label `release:minor`
 
 ### Fase 2: Multi-mode Support
