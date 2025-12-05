@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Code Forge is an Obsidian plugin that provides modern syntax highlighting using Shiki, smart paste handling, and advanced UI for code blocks.
+Code Forge is an Obsidian plugin that provides modern syntax highlighting using Shiki, with a clean UI for code blocks.
 
 ## Quick Start
 
@@ -21,18 +21,24 @@ obsidian-code-forge/
 ├── main.ts                      # Plugin entry point
 ├── src/
 │   ├── types/                   # TypeScript interfaces
-│   │   └── settings.ts          # Settings interface and defaults
+│   │   └── settings.ts          # Settings interface (minimal)
 │   ├── engine/                  # Shiki highlighting engine
-│   ├── theme/                   # Theme bridge and generators
-│   ├── paste/                   # Paste interception and handling
+│   │   ├── shiki-engine.ts      # Core engine with lazy loading
+│   │   ├── post-processor.ts    # MarkdownPostProcessor
+│   │   └── languages.ts         # Bundled languages list
+│   ├── themes/                  # Theme system
+│   │   ├── ObsidianTheme.ts     # TextMate scope → CSS var mappings
+│   │   ├── ThemeMapper.ts       # Placeholder hex → CSS var replacement
+│   │   └── index.ts             # Exports
 │   ├── ui/                      # UI components
-│   │   ├── components/          # Header, buttons, line numbers
-│   │   ├── icons/               # Language icons
+│   │   ├── components/          # Header, copy button (Phase 2)
+│   │   ├── icons/               # Language icons (Phase 2)
 │   │   └── settings-tab.ts      # Settings UI
-│   ├── utils/                   # Utilities
-│   └── i18n/                    # Internationalization
+│   └── paste/                   # Paste handling (Phase 3)
 ├── tests/                       # Test files
 │   └── __mocks__/               # Obsidian API mocks
+├── docs/                        # Documentation
+│   └── PROJECT_PLAN.md          # Detailed project plan
 └── .github/workflows/           # CI/CD pipelines
 ```
 
@@ -41,85 +47,79 @@ obsidian-code-forge/
 ### Code Style
 - Use TypeScript strict mode
 - Prefer `const` over `let`
-- Use meaningful variable names
 - Keep functions small and focused
-- Document complex logic with comments
+- No unnecessary abstractions
 
 ### Testing
-- Write tests for all public APIs
+- Write tests for public APIs
 - Mock Obsidian API using `tests/__mocks__/obsidian.ts`
 - Run `npm test` before committing
 
 ### Git Workflow
 1. Create feature branch from `main`
 2. Make changes and write tests
-3. Open PR with appropriate label:
-   - `release:patch` - Bug fixes
-   - `release:minor` - New features
-   - `release:major` - Breaking changes
-4. CI will create beta release for testing
+3. Open PR with label: `release:patch`, `release:minor`, or `release:major`
+4. CI creates beta release for BRAT testing
 5. Merge PR to trigger release
 
 ## Key Decisions
 
-- **Bundle Strategy**: Hybrid - Top 20 languages bundled, others lazy-loaded
-- **Mobile Support**: High priority - must work on iOS/Android
-- **Paste Behavior**: Cmd+V preserves indentation by default
-- **Plugin Conflicts**: Show warning only, allow coexistence
+- **Theme**: CSS variables that adapt to active Obsidian theme (no bundled themes)
+- **Bundle Strategy**: Top 20 languages bundled, others lazy-loaded
+- **Settings**: Minimal - only `showCopyButton` exposed to user
+- **UI**: Header always visible with language icon + name + copy button
 
-## Architecture Notes
+## Architecture
 
 ### Shiki Integration
-- Use `shiki` v3+ for syntax highlighting
-- Lazy load grammars for non-bundled languages
-- Cache highlighted output for performance
+- ShikiEngine class with lazy grammar loading
+- MarkdownPostProcessor for Reading view
+- Cache for performance (internal, not configurable)
 
-### Theme Bridge
-- Read CSS variables from active Obsidian theme
-- Generate Shiki theme dynamically
-- Watch for theme changes with MutationObserver
+### Theme System (CSS Variables)
+- ObsidianTheme defines TextMate scope → CSS variable mappings
+- ThemeMapper replaces CSS vars with placeholder hex for Shiki, then restores
+- Fallback colors in styles.css for themes that don't define `--shiki-code-*`
 
-### Paste Handling
-- Intercept paste via EditorView.domEventHandlers
-- Detect if cursor is inside code block
-- Preserve original whitespace/indentation
+### CSS Variables Used
+```css
+--shiki-code-background
+--shiki-code-normal
+--shiki-code-keyword
+--shiki-code-function
+--shiki-code-property
+--shiki-code-string
+--shiki-code-comment
+--shiki-code-value
+--shiki-code-important
+--shiki-code-punctuation
+```
 
-## TODOs
+## Progress
 
-### Phase 1: Shiki Engine ✅
-- [x] Integrate Shiki as dependency
-- [x] Create ShikiEngine class
-- [x] Implement lazy grammar loading
-- [x] Create MarkdownPostProcessor
-- [x] CSS variables theme (adapts to Obsidian theme)
+### Phase 1: Shiki Engine ✅ DONE
+- [x] ShikiEngine with lazy loading
+- [x] MarkdownPostProcessor for Reading view
+- [x] CSS variables theme (ObsidianTheme + ThemeMapper)
+- [x] Fallback colors in styles.css
 
-### Phase 2: Multi-mode Support
-- [ ] EditorExtension for Live Preview
-- [ ] Decorations for Source mode
-- [ ] Sync cache between modes
+### Phase 2: UI Components 🔄 CURRENT
+- [ ] Header component (icon + language name)
+- [ ] Copy button with feedback
+- [ ] Container wrapper
 
 ### Phase 3: Paste Handling
-- [ ] Intercept paste events
+- [ ] Intercept paste in code blocks
 - [ ] Preserve indentation
-- [ ] Auto-detect language
 
-### Phase 4: UI Components
-- [ ] Header with language name/icon
-- [ ] Copy button with feedback
-- [ ] Fold/collapse
-- [ ] Line numbers
-- [ ] Line highlighting
+### Phase 4: Live Preview Support
+- [ ] EditorExtension for CodeMirror 6
+- [ ] Source mode decorations
 
-### Phase 5: Theme Integration
-- [ ] CSS variables reader
-- [ ] Dynamic theme generator
-- [ ] Theme change detection
-
-### Phase 6: Polish
-- [ ] Complete settings UI
-- [ ] i18n (EN + IT)
-- [ ] Documentation
+### Phase 5: Polish & Release
 - [ ] Cross-platform testing
+- [ ] Documentation
+- [ ] Community plugin submission
 
 ## Credits
 

@@ -18,14 +18,12 @@ export default class CodeForgePlugin extends Plugin {
 
     // Register markdown post processor for syntax highlighting in Reading view
     this.registerMarkdownPostProcessor(
-      createShikiPostProcessor(this.shikiEngine, this.settings.debugMode)
+      createShikiPostProcessor(this.shikiEngine)
     );
 
     // TODO: Phase 2 - Register editor extensions for multi-mode support
     // TODO: Phase 3 - Register paste handlers
     // TODO: Phase 4 - Register UI components (header, copy button, etc.)
-
-    console.log("Code Forge plugin loaded");
   }
 
   override onunload(): void {
@@ -34,7 +32,6 @@ export default class CodeForgePlugin extends Plugin {
       this.shikiEngine.dispose();
       this.shikiEngine = null;
     }
-    console.log("Code Forge plugin unloaded");
   }
 
   async loadSettings(): Promise<void> {
