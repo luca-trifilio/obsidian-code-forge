@@ -1,0 +1,74 @@
+name: Manual Release
+
+on:
+  release:
+    types: [created]
+
+jobs:
+  build-and-upload:
+    # Only run for releases created manually (not by workflows)
+    if: github.event.release.author.login != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update version in files
+        id: version
+        run: |
+          version="${{ github.event.release.tag_name }}"
+          # Remove 'v' prefix if present
+          version="${version#v}"
+
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "Updating to version: $version"
+
+          # Update package.json
+          jq ".version = \"$version\"" package.json > tmp.json && mv tmp.json package.json
+
+          # Update package-lock.json
+          npm version "$version" --no-git-tag-version --allow-same-version
+
+          # Update manifest.json
+          jq ".version = \"$version\"" manifest.json > tmp.json && mv tmp.json manifest.json
+
+          # Update versions.json
+          min_app_version=$(jq -r .minAppVersion manifest.json)
+          jq ". + {\"$version\": \"$min_app_version\"}" versions.json > tmp.json && mv tmp.json versions.json
+
+      - name: Build
+        run: npm run build
+
+      - name: Commit version bump
+        run: |
+          version="${{ steps.version.outputs.version }}"
+
+          git add package.json package-lock.json manifest.json versions.json
+          git commit -m "$version" || echo "No changes to commit"
+          git push origin main
+
+      - name: Upload assets to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${{ github.event.release.tag_name }}"
+
+          echo "Uploading assets to release: $tag"
+          gh release upload "$tag" main.js manifest.json styles.css --clobber

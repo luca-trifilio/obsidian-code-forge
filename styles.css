@@ -1,0 +1,265 @@
+/* Code Forge - Obsidian Plugin Styles */
+
+/* ==========================================================================
+   Code Block Container
+   ========================================================================== */
+
+.code-forge-container {
+  position: relative;
+  margin: 1em 0;
+  border-radius: var(--radius-m);
+  overflow: hidden;
+}
+
+.code-forge-container pre {
+  margin: 0;
+  padding: 1em;
+  overflow-x: auto;
+}
+
+.code-forge-container code {
+  font-family: var(--font-monospace);
+  font-size: var(--font-smaller);
+  line-height: var(--line-height-tight);
+}
+
+/* ==========================================================================
+   Header
+   ========================================================================== */
+
+.code-forge-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5em 1em;
+  background: var(--background-secondary);
+  border-bottom: 1px solid var(--background-modifier-border);
+  font-size: var(--font-smaller);
+}
+
+.code-forge-header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.code-forge-header-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+.code-forge-language-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.8;
+}
+
+.code-forge-language-name {
+  color: var(--text-muted);
+  text-transform: uppercase;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+}
+
+.code-forge-title {
+  color: var(--text-normal);
+  font-weight: 500;
+}
+
+/* ==========================================================================
+   Copy Button
+   ========================================================================== */
+
+.code-forge-copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 8px;
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.code-forge-copy-btn:hover {
+  background: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.code-forge-copy-btn.copied {
+  color: var(--text-success);
+}
+
+.code-forge-copy-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ==========================================================================
+   Fold Control
+   ========================================================================== */
+
+.code-forge-fold-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  border: none;
+  border-radius: var(--radius-s);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.code-forge-fold-btn:hover {
+  color: var(--text-normal);
+}
+
+.code-forge-fold-btn.folded {
+  transform: rotate(-90deg);
+}
+
+.code-forge-fold-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.code-forge-container.folded pre {
+  display: none;
+}
+
+/* ==========================================================================
+   Line Numbers
+   ========================================================================== */
+
+.code-forge-line-numbers {
+  position: absolute;
+  left: 0;
+  top: 0;
+  padding: 1em 0.5em;
+  text-align: right;
+  color: var(--text-faint);
+  font-size: var(--font-smaller);
+  user-select: none;
+  pointer-events: none;
+  border-right: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+}
+
+.code-forge-container.has-line-numbers pre {
+  padding-left: 3.5em;
+}
+
+.code-forge-container.line-numbers-hover .code-forge-line-numbers {
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.code-forge-container.line-numbers-hover:hover .code-forge-line-numbers {
+  opacity: 1;
+}
+
+/* ==========================================================================
+   Line Highlighting
+   ========================================================================== */
+
+.code-forge-line {
+  display: block;
+  padding: 0 1em;
+  margin: 0 -1em;
+}
+
+.code-forge-line.highlighted {
+  background: var(--text-highlight-bg);
+}
+
+.code-forge-line.inserted {
+  background: rgba(var(--color-green-rgb), 0.15);
+}
+
+.code-forge-line.deleted {
+  background: rgba(var(--color-red-rgb), 0.15);
+}
+
+.code-forge-line.inserted::before {
+  content: "+";
+  color: var(--color-green);
+  margin-right: 0.5em;
+}
+
+.code-forge-line.deleted::before {
+  content: "-";
+  color: var(--color-red);
+  margin-right: 0.5em;
+}
+
+/* ==========================================================================
+   Toast Notification
+   ========================================================================== */
+
+.code-forge-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 8px 16px;
+  background: var(--background-secondary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: var(--radius-m);
+  box-shadow: var(--shadow-s);
+  font-size: var(--font-smaller);
+  color: var(--text-normal);
+  z-index: var(--layer-notice);
+  animation: code-forge-toast-in 0.2s ease;
+}
+
+.code-forge-toast.success {
+  border-color: var(--color-green);
+}
+
+@keyframes code-forge-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==========================================================================
+   Settings Tab Styles
+   ========================================================================== */
+
+.code-forge-settings h1 {
+  margin-bottom: 0.5em;
+}
+
+.code-forge-settings h2 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  padding-bottom: 0.25em;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+/* ==========================================================================
+   Conflict Warning
+   ========================================================================== */
+
+.code-forge-conflict-warning {
+  padding: 1em;
+  margin: 1em 0;
+  background: rgba(var(--color-yellow-rgb), 0.1);
+  border: 1px solid var(--color-yellow);
+  border-radius: var(--radius-m);
+}
+
+.code-forge-conflict-warning-title {
+  font-weight: 600;
+  color: var(--color-yellow);
+  margin-bottom: 0.5em;
+}

@@ -1,0 +1,11 @@
+{
+  "id": "code-forge",
+  "name": "Code Forge",
+  "version": "0.1.0",
+  "minAppVersion": "0.15.0",
+  "description": "Modern syntax highlighting with Shiki, smart paste handling, and advanced UI for code blocks",
+  "author": "Luca Trifilio",
+  "authorUrl": "https://github.com/luca-trifilio",
+  "fundingUrl": "",
+  "isDesktopOnly": false
+}
