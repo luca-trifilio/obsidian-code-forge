@@ -112,7 +112,7 @@ export class ThemeMapper {
    * Used for token-based rendering (Edit mode).
    *
    * @param placeholder - The placeholder hex color (e.g., "#000001")
-   * @returns The CSS variable (e.g., "var(--shiki-code-keyword)") or original if not found
+   * @returns The CSS variable (e.g., "var(--shiki-code-keyword)") or undefined if not found
    */
   placeholderToCssVar(placeholder: string | undefined): string | undefined {
     if (!placeholder) return undefined;
@@ -126,6 +126,7 @@ export class ThemeMapper {
       }
     }
 
-    return placeholder;
+    // Return undefined if not found - caller should handle fallback
+    return undefined;
   }
 }

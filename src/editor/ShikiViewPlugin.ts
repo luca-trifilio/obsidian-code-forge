@@ -154,18 +154,18 @@ export function createShikiViewPlugin(engine: ShikiEngine) {
 
               // Ensure within bounds
               if (tokenStart >= 0 && tokenEnd <= doc.length && tokenEnd <= codeLine.to + 1) {
-                const color = themeMapper.placeholderToCssVar(token.color);
+                // Convert placeholder to CSS variable, fallback to normal color
+                const color = themeMapper.placeholderToCssVar(token.color)
+                  ?? "var(--shiki-code-normal)";
 
-                if (color) {
-                  const decoration = Decoration.mark({
-                    attributes: {
-                      style: `color: ${color};`,
-                      class: "code-forge-token",
-                    },
-                  });
+                const decoration = Decoration.mark({
+                  attributes: {
+                    style: `color: ${color};`,
+                    class: "code-forge-token",
+                  },
+                });
 
-                  builder.add(tokenStart, tokenEnd, decoration);
-                }
+                builder.add(tokenStart, tokenEnd, decoration);
               }
 
               charOffset += token.content.length;

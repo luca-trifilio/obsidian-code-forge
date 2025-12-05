@@ -37,19 +37,31 @@ Integrazione di Shiki con tema CSS variables che si adatta al tema Obsidian atti
 
 Supporto per Source mode e Live Preview (non solo Reading view).
 
-**Tasks**:
-- [ ] EditorExtension per CodeMirror 6
-- [ ] ViewPlugin per rendering code blocks
-- [ ] Decorations per Source mode
-- [ ] Sync con ShikiEngine esistente
+**Completato**:
+- [x] EditorExtension per CodeMirror 6
+- [x] ViewPlugin per rendering code blocks
+- [x] Decorations per Source mode
+- [x] Sync con ShikiEngine esistente
+- [x] Posizioni token corrette
+- [x] Colori CSS variables allineati con Read mode
 
-**Approccio**:
-CodeMirror 6 usa `ViewPlugin` e `Decoration` per modificare la visualizzazione.
-Dobbiamo creare decorazioni che sostituiscono il testo nei code blocks con HTML Shiki.
+**In corso**:
+- [ ] **Testing** - Verificare che colori siano identici in entrambi i mode
 
-**File da creare**:
-- `src/editor/ShikiExtension.ts` - EditorExtension principale
-- `src/editor/ShikiViewPlugin.ts` - ViewPlugin che gestisce decorazioni
+**Soluzione implementata**:
+1. `ThemeMapper.placeholderToCssVar()` ora ritorna `undefined` se placeholder non trovato
+2. `ShikiViewPlugin` usa fallback `var(--shiki-code-normal)` per token senza colore
+3. CSS specifico per `.code-forge-token` in Edit mode (styles.css)
+
+Questo assicura che:
+- Tutti i token abbiano sempre un colore CSS variable
+- Il fallback sia consistente con Read mode (`--shiki-code-normal`)
+- Le decorazioni CM6 abbiano priorità sui colori default dell'editor
+
+**File**:
+- `src/editor/ShikiViewPlugin.ts` - ViewPlugin con decorazioni e fallback colori
+- `src/themes/ThemeMapper.ts` - Conversione placeholder → CSS var
+- `styles.css` - Regole CSS per Edit mode
 
 ---
 
