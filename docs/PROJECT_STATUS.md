@@ -3,7 +3,7 @@
 > Documento di riepilogo sullo stato di sviluppo del plugin Code Forge per Obsidian
 
 **Data:** 2025-12-05
-**Fase corrente:** Fase 0 - Setup Progetto (quasi completata)
+**Fase corrente:** Fase 1 - Shiki Engine Base
 
 ---
 
@@ -116,7 +116,7 @@ Plugin "all-in-one" che combina:
 | Verificare `npm run lint` | ✅ | 0 errori, 2 warning |
 | Setup husky pre-commit | ✅ | lint + test |
 | Commit iniziale | ✅ | Completato |
-| Push su GitHub | ❌ | Da fare |
+| Push su GitHub | ✅ | Completato |
 
 ### Fase 1: Shiki Engine Base (Non iniziata)
 
