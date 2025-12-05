@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from "obsidian";
+import { App, PluginSettingTab } from "obsidian";
 import type CodeForgePlugin from "../../main";
 
 export class CodeForgeSettingTab extends PluginSettingTab {
@@ -21,17 +21,28 @@ export class CodeForgeSettingTab extends PluginSettingTab {
       cls: "setting-item-description",
     });
 
-    // UI Section
-    containerEl.createEl("h2", { text: "Interface" });
+    // Info
+    containerEl.createEl("p", {
+      text: "Code Forge provides enhanced syntax highlighting using Shiki. It works automatically with your theme's code block styling.",
+      cls: "setting-item-description",
+    });
 
-    new Setting(containerEl)
-      .setName("Show copy button")
-      .setDesc("Display a copy button in the code block header")
-      .addToggle((toggle) =>
-        toggle.setValue(this.plugin.settings.showCopyButton).onChange(async (value) => {
-          this.plugin.settings.showCopyButton = value;
-          await this.plugin.saveSettings();
-        })
-      );
+    // CSS Variables info
+    containerEl.createEl("h2", { text: "Theme Customization" });
+    containerEl.createEl("p", {
+      text: "Theme authors can customize syntax colors by defining these CSS variables:",
+      cls: "setting-item-description",
+    });
+
+    const codeEl = containerEl.createEl("pre");
+    codeEl.createEl("code", {
+      text: `--shiki-code-background
+--shiki-code-normal
+--shiki-code-keyword
+--shiki-code-function
+--shiki-code-string
+--shiki-code-comment
+--shiki-code-value`,
+    });
   }
 }

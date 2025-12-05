@@ -2,12 +2,9 @@
  * Plugin settings interface
  *
  * Philosophy: Less is more. The plugin works out-of-the-box.
- * Only expose settings that users actually need to customize.
+ * Focus on best syntax highlighting, delegate UI to themes.
  */
 export interface CodeForgeSettings {
-  // UI
-  showCopyButton: boolean;
-
   // Internal (not exposed in UI)
   cacheEnabled: boolean;
   cacheMaxSize: number;
@@ -17,10 +14,6 @@ export interface CodeForgeSettings {
  * Default plugin settings
  */
 export const DEFAULT_SETTINGS: CodeForgeSettings = {
-  // UI
-  showCopyButton: true,
-
-  // Internal
   cacheEnabled: true,
   cacheMaxSize: 100,
 };

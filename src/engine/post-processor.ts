@@ -1,23 +1,13 @@
 import { MarkdownPostProcessorContext } from "obsidian";
 import { ShikiEngine } from "./shiki-engine";
-import { wrapCodeBlock } from "../ui/components";
-
-export interface PostProcessorOptions {
-  /** Whether to show copy button in header */
-  showCopyButton: boolean;
-}
 
 /**
  * Creates a MarkdownPostProcessor for Shiki syntax highlighting
  *
  * This processor intercepts code blocks in Reading view and replaces
- * Obsidian's default Prism.js highlighting with Shiki, adding a header
- * with language icon and copy button.
+ * Obsidian's default Prism.js highlighting with Shiki.
  */
-export function createShikiPostProcessor(
-  engine: ShikiEngine,
-  getOptions: () => PostProcessorOptions
-) {
+export function createShikiPostProcessor(engine: ShikiEngine) {
   return async (
     el: HTMLElement,
     _ctx: MarkdownPostProcessorContext
@@ -33,8 +23,6 @@ export function createShikiPostProcessor(
     if (codeBlocks.length === 0) {
       return;
     }
-
-    const options = getOptions();
 
     const promises = Array.from(codeBlocks).map(async (codeEl) => {
       const pre = codeEl.parentElement;
@@ -60,14 +48,8 @@ export function createShikiPostProcessor(
           // Copy data attributes from original
           copyDataAttributes(pre, newPre);
 
-          // Wrap with container and header
-          const container = wrapCodeBlock(newPre as HTMLElement, {
-            language: lang,
-            showCopyButton: options.showCopyButton,
-          });
-
           // Replace the original pre element
-          pre.replaceWith(container);
+          pre.replaceWith(newPre);
         }
       } catch (error) {
         console.error("[Code Forge] Failed to highlight code block:", error);
