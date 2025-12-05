@@ -223,6 +223,13 @@ export class ShikiEngine {
   }
 
   /**
+   * Get the theme mapper for token color conversion
+   */
+  getThemeMapper(): ThemeMapper {
+    return this.themeMapper;
+  }
+
+  /**
    * Dispose the highlighter and free resources
    */
   dispose(): void {
