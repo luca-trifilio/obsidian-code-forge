@@ -17,12 +17,15 @@ import { syntaxTree } from "@codemirror/language";
 import { RangeSetBuilder } from "@codemirror/state";
 import type { ShikiEngine } from "../engine/shiki-engine";
 
+interface CodeBlockLine {
+  from: number; // Document position where line starts
+  to: number;   // Document position where line ends
+  text: string; // Line content
+}
+
 interface CodeBlock {
-  from: number;
-  to: number;
   language: string;
-  code: string;
-  codeStart: number; // Position where actual code starts (after ```)
+  lines: CodeBlockLine[];
 }
 
 /**
@@ -35,12 +38,10 @@ export function createShikiViewPlugin(engine: ShikiEngine) {
 
     constructor(view: EditorView) {
       this.decorations = Decoration.none;
-      // Initial async decoration computation
       this.computeDecorationsAsync(view);
     }
 
     update(update: ViewUpdate) {
-      // Recompute on document or viewport changes
       if (update.docChanged || update.viewportChanged) {
         this.computeDecorationsAsync(update.view);
       }
@@ -53,10 +54,7 @@ export function createShikiViewPlugin(engine: ShikiEngine) {
       try {
         const codeBlocks = this.findCodeBlocks(view);
         const decorations = await this.buildDecorations(view, codeBlocks);
-
-        // Apply decorations
         this.decorations = decorations;
-        // Trigger redraw
         view.requestMeasure();
       } finally {
         this.pendingUpdate = false;
@@ -64,63 +62,57 @@ export function createShikiViewPlugin(engine: ShikiEngine) {
     }
 
     /**
-     * Find all code blocks in the visible viewport
+     * Find all code blocks by traversing the syntax tree
      */
     private findCodeBlocks(view: EditorView): CodeBlock[] {
       const blocks: CodeBlock[] = [];
       const doc = view.state.doc;
       const tree = syntaxTree(view.state);
 
-      // Track code block state
       let currentBlock: {
-        from: number;
         language: string;
-        codeStart: number;
-        lines: string[];
+        lines: CodeBlockLine[];
       } | null = null;
 
       tree.iterate({
         enter: (node) => {
           const name = node.name;
 
-          // HyperMD-codeblock-begin marks the start (```)
+          // Start of code block (```)
           if (name === "HyperMD-codeblock-begin" || name.includes("codeblock-begin")) {
             const lineText = doc.sliceString(node.from, node.to);
-            // Extract language from ```language
             const match = lineText.match(/^```(\w+)?/);
             const language = match?.[1] || "text";
 
             currentBlock = {
-              from: node.from,
               language,
-              codeStart: node.to + 1, // After the newline
               lines: [],
             };
           }
 
-          // HyperMD-codeblock is the content line
+          // Code content line - save position AND text
           if (
             currentBlock &&
             (name === "HyperMD-codeblock" || name.includes("codeblock")) &&
             !name.includes("begin") &&
             !name.includes("end")
           ) {
-            const lineText = doc.sliceString(node.from, node.to);
-            currentBlock.lines.push(lineText);
+            currentBlock.lines.push({
+              from: node.from,
+              to: node.to,
+              text: doc.sliceString(node.from, node.to),
+            });
           }
 
-          // HyperMD-codeblock-end marks the end (```)
+          // End of code block (```)
           if (name === "HyperMD-codeblock-end" || name.includes("codeblock-end")) {
-            if (currentBlock) {
+            if (currentBlock && currentBlock.lines.length > 0) {
               blocks.push({
-                from: currentBlock.from,
-                to: node.to,
                 language: currentBlock.language,
-                code: currentBlock.lines.join("\n"),
-                codeStart: currentBlock.codeStart,
+                lines: currentBlock.lines,
               });
-              currentBlock = null;
             }
+            currentBlock = null;
           }
         },
       });
@@ -137,33 +129,31 @@ export function createShikiViewPlugin(engine: ShikiEngine) {
     ): Promise<DecorationSet> {
       const builder = new RangeSetBuilder<Decoration>();
       const themeMapper = engine.getThemeMapper();
+      const doc = view.state.doc;
 
       for (const block of codeBlocks) {
-        if (block.code.length === 0) continue;
+        if (block.lines.length === 0) continue;
 
         try {
-          const result = await engine.getTokens(block.code, block.language);
-          const doc = view.state.doc;
+          // Get code as single string for Shiki
+          const code = block.lines.map(l => l.text).join("\n");
+          const result = await engine.getTokens(code, block.language);
 
-          // Calculate base position (start of first code line)
-          let pos = block.codeStart;
-
+          // Apply tokens line by line
           for (let lineIdx = 0; lineIdx < result.tokens.length; lineIdx++) {
             const lineTokens = result.tokens[lineIdx];
-            if (!lineTokens) continue;
+            const codeLine = block.lines[lineIdx];
+
+            if (!lineTokens || !codeLine) continue;
 
             let charOffset = 0;
 
-            // Get the line in the document
-            const lineStart = pos;
-
             for (const token of lineTokens) {
-              const tokenStart = lineStart + charOffset;
+              const tokenStart = codeLine.from + charOffset;
               const tokenEnd = tokenStart + token.content.length;
 
-              // Only add decoration if within document bounds
-              if (tokenStart >= 0 && tokenEnd <= doc.length) {
-                // Convert placeholder hex to CSS variable
+              // Ensure within bounds
+              if (tokenStart >= 0 && tokenEnd <= doc.length && tokenEnd <= codeLine.to + 1) {
                 const color = themeMapper.placeholderToCssVar(token.color);
 
                 if (color) {
@@ -180,9 +170,6 @@ export function createShikiViewPlugin(engine: ShikiEngine) {
 
               charOffset += token.content.length;
             }
-
-            // Move to next line (+1 for newline character)
-            pos += (lineIdx < result.tokens.length - 1 ? charOffset + 1 : charOffset);
           }
         } catch (error) {
           console.warn("[Code Forge] Failed to highlight code block:", error);
@@ -192,9 +179,7 @@ export function createShikiViewPlugin(engine: ShikiEngine) {
       return builder.finish();
     }
 
-    destroy() {
-      // Cleanup if needed
-    }
+    destroy() {}
   }
 
   return ViewPlugin.fromClass(ShikiViewPluginClass, {
