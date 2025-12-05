@@ -72,6 +72,7 @@ export function createShikiViewPlugin(engine: ShikiEngine) {
       let currentBlock: {
         language: string;
         lines: CodeBlockLine[];
+        seenPositions: Set<number>;
       } | null = null;
 
       tree.iterate({
@@ -87,16 +88,18 @@ export function createShikiViewPlugin(engine: ShikiEngine) {
             currentBlock = {
               language,
               lines: [],
+              seenPositions: new Set(),
             };
           }
 
-          // Code content line - save position AND text
+          // Code content line - only exact match, not child nodes
+          // Use exact name match to avoid capturing nested/child nodes
           if (
             currentBlock &&
-            (name === "HyperMD-codeblock" || name.includes("codeblock")) &&
-            !name.includes("begin") &&
-            !name.includes("end")
+            name === "HyperMD-codeblock" &&
+            !currentBlock.seenPositions.has(node.from)
           ) {
+            currentBlock.seenPositions.add(node.from);
             currentBlock.lines.push({
               from: node.from,
               to: node.to,
