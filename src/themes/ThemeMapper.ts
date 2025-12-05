@@ -84,27 +84,11 @@ export class ThemeMapper {
    */
   fixHTML(html: string): string {
     let result = html;
-
-    // DEBUG: Log mapping and sample of HTML
-    console.log("[Code Forge DEBUG] Mapping size:", this.mapping.size);
-    console.log("[Code Forge DEBUG] First 5 mappings:");
-    let count = 0;
     for (const [cssVar, placeholder] of this.mapping) {
-      if (count < 5) {
-        console.log(`  ${placeholder} -> ${cssVar}`);
-        count++;
-      }
-    }
-    console.log("[Code Forge DEBUG] HTML before fix (first 500 chars):", html.substring(0, 500));
-
-    for (const [cssVar, placeholder] of this.mapping) {
-      // Try both uppercase and lowercase
+      // Replace both uppercase and lowercase versions
       result = result.replaceAll(placeholder, cssVar);
       result = result.replaceAll(placeholder.toLowerCase(), cssVar);
     }
-
-    console.log("[Code Forge DEBUG] HTML after fix (first 500 chars):", result.substring(0, 500));
-
     return result;
   }
 
