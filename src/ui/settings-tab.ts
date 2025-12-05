@@ -81,12 +81,14 @@ export class CodeForgeSettingTab extends PluginSettingTab {
         .setDesc("Theme to use in dark mode")
         .addDropdown((dropdown) =>
           dropdown
+            .addOption("github-dark", "GitHub Dark")
             .addOption("dracula", "Dracula")
             .addOption("nord", "Nord")
-            .addOption("one-dark", "One Dark")
+            .addOption("one-dark-pro", "One Dark Pro")
+            .addOption("vitesse-dark", "Vitesse Dark")
             .setValue(this.plugin.settings.themeDark)
             .onChange(async (value) => {
-              this.plugin.settings.themeDark = value as "dracula" | "nord" | "one-dark";
+              this.plugin.settings.themeDark = value as typeof this.plugin.settings.themeDark;
               await this.plugin.saveSettings();
             })
         );
@@ -96,11 +98,12 @@ export class CodeForgeSettingTab extends PluginSettingTab {
         .setDesc("Theme to use in light mode")
         .addDropdown((dropdown) =>
           dropdown
+            .addOption("github-light", "GitHub Light")
             .addOption("solarized-light", "Solarized Light")
-            .addOption("solarized-dark", "Solarized Dark")
+            .addOption("vitesse-light", "Vitesse Light")
             .setValue(this.plugin.settings.themeLight)
             .onChange(async (value) => {
-              this.plugin.settings.themeLight = value as "solarized-light" | "solarized-dark";
+              this.plugin.settings.themeLight = value as typeof this.plugin.settings.themeLight;
               await this.plugin.saveSettings();
             })
         );

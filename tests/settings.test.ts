@@ -12,7 +12,7 @@ describe("Settings", () => {
 
     it("should have valid theme settings", () => {
       expect(DEFAULT_SETTINGS.themeSource).toBe("auto");
-      expect(DEFAULT_SETTINGS.bundledTheme).toBe("dracula");
+      expect(DEFAULT_SETTINGS.bundledTheme).toBe("github-dark");
       expect(DEFAULT_SETTINGS.autoSyncTheme).toBe(true);
     });
 
