@@ -149,12 +149,53 @@ Soluzione: usare `color: unset` per resettare le regole del tema.
 
 ---
 
+---
+
+### Sessione 5: CSS Variables Theme (Shiki Integration)
+
+**Branch:** `feature/shiki-engine`
+
+**Problema:** L'highlighting non rispettava i colori del tema Obsidian. Il plugin Shiki di mProjectsCode funzionava molto meglio.
+
+**Soluzione implementata:**
+Copiato l'approccio di mProjectsCode/obsidian-shiki-plugin (MIT License):
+
+1. **ThemeMapper.ts** - Mappa CSS variables → placeholder hex
+   - `var(--shiki-code-keyword)` → `#000001`
+   - Shiki riceve tema con hex validi
+   - Post-processing: `#000001` → `var(--shiki-code-keyword)`
+
+2. **ObsidianTheme.ts** - ~400 righe di scope mappings
+   - TextMate scopes → CSS variables
+   - Supporto per keywords, functions, types, strings, comments, etc.
+
+3. **styles.css** - Fallback CSS variables
+   - Dark mode: colori Dracula
+   - Light mode: colori chiari complementari
+
+**File creati:**
+- `src/themes/ObsidianTheme.ts`
+- `src/themes/ThemeMapper.ts`
+- `src/themes/index.ts`
+
+**File modificati:**
+- `src/engine/shiki-engine.ts` - Usa ThemeMapper
+- `main.ts` - Rimossa opzione theme (ora automatica)
+- `styles.css` - Aggiunte CSS variables fallback
+- `tsconfig.json` - ES2021 per replaceAll()
+- `CLAUDE.md` - Aggiunti crediti
+
+**Build e test:** ✅ 28 test passati
+
+---
+
 ## Prossimi Passi
 
 ### Da completare (Fase 1)
 - [x] Risolvere CSS conflict con tema Baseline
-- [ ] Testare con altri temi
-- [x] Rimuovere debug logging
+- [x] Implementare CSS variables theme
+- [x] Testare con Shiki
+- [ ] Testare con altri temi Obsidian
 - [ ] Merge PR con label `release:minor`
 
 ### Fase 2: Multi-mode Support

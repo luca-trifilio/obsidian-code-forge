@@ -2,8 +2,8 @@ import {
   createHighlighter,
   type Highlighter,
   type BundledLanguage,
-  type BundledTheme,
 } from "shiki";
+import { ThemeMapper, OBSIDIAN_THEME_IDENTIFIER } from "../themes";
 
 /**
  * Top 20 most common languages - bundled for instant highlighting
@@ -56,15 +56,15 @@ export const LANGUAGE_ALIASES: Record<string, string> = {
 };
 
 export interface ShikiEngineOptions {
-  theme?: BundledTheme;
   defaultLanguage?: string;
 }
 
 /**
- * ShikiEngine - Manages Shiki highlighter instance with lazy loading
+ * ShikiEngine - Manages Shiki highlighter instance with CSS variable theme support
  *
  * Features:
  * - Lazy initialization (highlighter created on first use)
+ * - CSS variable-based theme that adapts to Obsidian themes
  * - Top 20 languages bundled for instant highlighting
  * - Dynamic language loading for other languages
  * - Language alias resolution
@@ -74,16 +74,16 @@ export class ShikiEngine {
   private highlighter: Highlighter | null = null;
   private initPromise: Promise<Highlighter> | null = null;
   private loadedLanguages: Set<string> = new Set();
-  private theme: BundledTheme;
+  private themeMapper: ThemeMapper;
   private defaultLanguage: string;
 
   constructor(options: ShikiEngineOptions = {}) {
-    this.theme = options.theme ?? "github-dark";
     this.defaultLanguage = options.defaultLanguage ?? "plaintext";
+    this.themeMapper = new ThemeMapper();
   }
 
   /**
-   * Initialize the highlighter with bundled languages
+   * Initialize the highlighter with bundled languages and CSS variable theme
    * Called lazily on first highlight request
    */
   private async init(): Promise<Highlighter> {
@@ -95,8 +95,11 @@ export class ShikiEngine {
       return this.initPromise;
     }
 
+    // Get theme with placeholder hex colors for Shiki
+    const mappedTheme = this.themeMapper.getMappedTheme();
+
     this.initPromise = createHighlighter({
-      themes: [this.theme],
+      themes: [mappedTheme],
       langs: BUNDLED_LANGUAGES,
     }).then((highlighter) => {
       this.highlighter = highlighter;
@@ -148,9 +151,12 @@ export class ShikiEngine {
   /**
    * Highlight code with the specified language
    *
+   * Uses CSS variables in the output, allowing colors to be defined
+   * by the active Obsidian theme.
+   *
    * @param code - The code to highlight
    * @param lang - The language identifier (supports aliases)
-   * @returns HTML string with highlighted code
+   * @returns HTML string with highlighted code using CSS variables
    */
   async highlight(code: string, lang: string): Promise<string> {
     const highlighter = await this.init();
@@ -161,25 +167,29 @@ export class ShikiEngine {
       const loaded = await this.loadLanguage(resolved);
       if (!loaded) {
         // Fallback to default language
-        return highlighter.codeToHtml(code, {
+        const html = highlighter.codeToHtml(code, {
           lang: this.defaultLanguage,
-          theme: this.theme,
+          theme: OBSIDIAN_THEME_IDENTIFIER,
         });
+        return this.themeMapper.fixHTML(html);
       }
     }
 
     try {
-      return highlighter.codeToHtml(code, {
+      const html = highlighter.codeToHtml(code, {
         lang: resolved as BundledLanguage,
-        theme: this.theme,
+        theme: OBSIDIAN_THEME_IDENTIFIER,
       });
+      // Post-process: replace placeholder hex colors with CSS variables
+      return this.themeMapper.fixHTML(html);
     } catch (error) {
       console.warn(`[Code Forge] Highlight error for ${lang}:`, error);
       // Fallback to plain text
-      return highlighter.codeToHtml(code, {
+      const html = highlighter.codeToHtml(code, {
         lang: this.defaultLanguage,
-        theme: this.theme,
+        theme: OBSIDIAN_THEME_IDENTIFIER,
       });
+      return this.themeMapper.fixHTML(html);
     }
   }
 
@@ -201,19 +211,8 @@ export class ShikiEngine {
 
     return highlighter.codeToTokens(code, {
       lang: effectiveLang as BundledLanguage,
-      theme: this.theme,
+      theme: OBSIDIAN_THEME_IDENTIFIER,
     });
-  }
-
-  /**
-   * Update the theme
-   */
-  async setTheme(theme: BundledTheme): Promise<void> {
-    this.theme = theme;
-
-    if (this.highlighter) {
-      await this.highlighter.loadTheme(theme);
-    }
   }
 
   /**
@@ -233,5 +232,6 @@ export class ShikiEngine {
     }
     this.initPromise = null;
     this.loadedLanguages.clear();
+    this.themeMapper.reset();
   }
 }

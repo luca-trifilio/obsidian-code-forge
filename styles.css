@@ -1,13 +1,52 @@
 /* Code Forge - Obsidian Plugin Styles */
 
 /* ==========================================================================
+   Shiki CSS Variables - Fallback for themes that don't define them
+   ========================================================================== */
+
+/*
+ * These values are used if the active Obsidian theme doesn't define
+ * the --shiki-code-* CSS variables. Colors inspired by Dracula theme.
+ *
+ * Theme authors can override these by defining the variables in their theme.
+ */
+
+/* Dark mode fallback */
+.theme-dark {
+  --shiki-code-background: #282a36;
+  --shiki-code-normal: #f8f8f2;
+  --shiki-code-keyword: #ff79c6;
+  --shiki-code-function: #50fa7b;
+  --shiki-code-property: #8be9fd;
+  --shiki-code-string: #f1fa8c;
+  --shiki-code-comment: #6272a4;
+  --shiki-code-value: #bd93f9;
+  --shiki-code-important: #ffb86c;
+  --shiki-code-punctuation: #f8f8f2;
+}
+
+/* Light mode fallback */
+.theme-light {
+  --shiki-code-background: #f8f8f2;
+  --shiki-code-normal: #282a36;
+  --shiki-code-keyword: #d63384;
+  --shiki-code-function: #28a745;
+  --shiki-code-property: #0d6efd;
+  --shiki-code-string: #fd7e14;
+  --shiki-code-comment: #6c757d;
+  --shiki-code-value: #6f42c1;
+  --shiki-code-important: #dc3545;
+  --shiki-code-punctuation: #282a36;
+}
+
+/* ==========================================================================
    Shiki Highlighted Code Blocks
    ========================================================================== */
 
 /*
- * Shiki uses inline styles (style="color: #xxx") on span elements.
- * We need to ensure these are NOT overridden by theme CSS.
- * DO NOT set color or background-color here - let Shiki's inline styles win.
+ * Shiki output uses CSS variables (var(--shiki-code-*)) for colors.
+ * These variables are defined either by the active Obsidian theme
+ * or by our fallback values above.
  */
 
 /* Base pre styling */
@@ -16,6 +55,8 @@ pre.code-forge-highlighted {
   border-radius: var(--radius-m);
   overflow-x: auto;
   margin: 1em 0;
+  background-color: var(--shiki-code-background);
+  color: var(--shiki-code-normal);
 }
 
 /* Reset code element - let pre's background show through */

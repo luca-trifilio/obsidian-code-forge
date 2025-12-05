@@ -13,10 +13,8 @@ export default class CodeForgePlugin extends Plugin {
     // Register settings tab
     this.addSettingTab(new CodeForgeSettingTab(this.app, this));
 
-    // Phase 1 - Initialize Shiki engine
-    this.shikiEngine = new ShikiEngine({
-      theme: this.settings.bundledTheme,
-    });
+    // Phase 1 - Initialize Shiki engine with CSS variable theme
+    this.shikiEngine = new ShikiEngine();
 
     // Register markdown post processor for syntax highlighting in Reading view
     this.registerMarkdownPostProcessor(
