@@ -7,7 +7,7 @@ import { ShikiEngine } from "./shiki-engine";
  * This processor intercepts code blocks in Reading view and replaces
  * Obsidian's default Prism.js highlighting with Shiki.
  */
-export function createShikiPostProcessor(engine: ShikiEngine, debug = false) {
+export function createShikiPostProcessor(engine: ShikiEngine) {
   return async (
     el: HTMLElement,
     _ctx: MarkdownPostProcessorContext
@@ -32,17 +32,9 @@ export function createShikiPostProcessor(engine: ShikiEngine, debug = false) {
       const lang = extractLanguage(codeEl);
       const code = codeEl.textContent ?? "";
 
-      if (debug) {
-        console.log(`[Code Forge] Processing code block: lang=${lang}, length=${code.length}`);
-      }
-
       try {
         // Get highlighted HTML from Shiki
         const highlightedHtml = await engine.highlight(code, lang);
-
-        if (debug) {
-          console.log(`[Code Forge] Got highlighted HTML, length=${highlightedHtml.length}`);
-        }
 
         // Create a temporary container to parse the HTML
         const temp = document.createElement("div");
@@ -58,10 +50,6 @@ export function createShikiPostProcessor(engine: ShikiEngine, debug = false) {
 
           // Replace the original pre element
           pre.replaceWith(newPre);
-
-          if (debug) {
-            console.log("[Code Forge] Replaced pre element successfully");
-          }
         }
       } catch (error) {
         console.error("[Code Forge] Failed to highlight code block:", error);

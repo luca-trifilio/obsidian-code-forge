@@ -5,62 +5,37 @@ describe("Settings", () => {
   describe("DEFAULT_SETTINGS", () => {
     it("should have all required properties", () => {
       expect(DEFAULT_SETTINGS).toBeDefined();
-      expect(DEFAULT_SETTINGS.enabled).toBe(true);
-      expect(DEFAULT_SETTINGS.highlightingEnabled).toBe(true);
-      expect(DEFAULT_SETTINGS.smartPasteEnabled).toBe(true);
-    });
-
-    it("should have valid theme settings", () => {
-      expect(DEFAULT_SETTINGS.themeSource).toBe("auto");
-      expect(DEFAULT_SETTINGS.bundledTheme).toBe("dracula");
-      expect(DEFAULT_SETTINGS.autoSyncTheme).toBe(true);
-    });
-
-    it("should have valid UI settings", () => {
-      expect(DEFAULT_SETTINGS.showHeader).toBe(true);
       expect(DEFAULT_SETTINGS.showCopyButton).toBe(true);
-      expect(DEFAULT_SETTINGS.lineNumbers).toBe("hover");
-      expect(DEFAULT_SETTINGS.enableFolding).toBe(true);
     });
 
-    it("should have valid performance settings", () => {
-      expect(DEFAULT_SETTINGS.maxLinesSync).toBe(500);
+    it("should have valid internal settings", () => {
       expect(DEFAULT_SETTINGS.cacheEnabled).toBe(true);
       expect(DEFAULT_SETTINGS.cacheMaxSize).toBe(100);
-    });
-
-    it("should have valid paste settings", () => {
-      expect(DEFAULT_SETTINGS.defaultPasteBehavior).toBe("smart");
-      expect(DEFAULT_SETTINGS.autoDetectLanguage).toBe(true);
-      expect(DEFAULT_SETTINGS.autoWrapInCodeBlock).toBe(false);
     });
   });
 
   describe("Type safety", () => {
-    it("should allow valid theme source values", () => {
-      const settings: Partial<CodeForgeSettings> = {
-        themeSource: "auto",
+    it("should allow valid setting values", () => {
+      const settings: CodeForgeSettings = {
+        showCopyButton: false,
+        cacheEnabled: false,
+        cacheMaxSize: 50,
       };
-      expect(settings.themeSource).toBe("auto");
 
-      settings.themeSource = "bundled";
-      expect(settings.themeSource).toBe("bundled");
-
-      settings.themeSource = "custom";
-      expect(settings.themeSource).toBe("custom");
+      expect(settings.showCopyButton).toBe(false);
+      expect(settings.cacheEnabled).toBe(false);
+      expect(settings.cacheMaxSize).toBe(50);
     });
 
-    it("should allow valid line numbers display values", () => {
-      const settings: Partial<CodeForgeSettings> = {
-        lineNumbers: "always",
+    it("should merge with defaults correctly", () => {
+      const userSettings: Partial<CodeForgeSettings> = {
+        showCopyButton: false,
       };
-      expect(settings.lineNumbers).toBe("always");
 
-      settings.lineNumbers = "hover";
-      expect(settings.lineNumbers).toBe("hover");
+      const merged = { ...DEFAULT_SETTINGS, ...userSettings };
 
-      settings.lineNumbers = "never";
-      expect(settings.lineNumbers).toBe("never");
+      expect(merged.showCopyButton).toBe(false);
+      expect(merged.cacheEnabled).toBe(true); // From defaults
     });
   });
 });
