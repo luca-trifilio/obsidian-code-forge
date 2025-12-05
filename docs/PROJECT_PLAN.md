@@ -20,6 +20,11 @@ Integrazione di Shiki con tema CSS variables che si adatta al tema Obsidian atti
 - [x] ThemeMapper per placeholder hex → CSS variables
 - [x] Fallback colors in styles.css (dark/light mode)
 - [x] CI/CD con beta release automatiche via BRAT
+- [x] Settings semplificati (v0.1.1)
+
+**Releases**:
+- `0.1.0` - Initial Shiki integration
+- `0.1.1` - Settings cleanup, removed debug logging
 
 **File chiave**:
 - `src/engine/shiki-engine.ts` - Core engine
@@ -123,6 +128,7 @@ Supporto per Source mode e Live Preview (non solo Reading view).
 - ~~`tokenOverrides`~~ → Tema definisce i colori
 - ~~`enabled`~~ → Ridondante (Obsidian ha già toggle plugin)
 - ~~`highlightingEnabled`~~ → Se plugin attivo, highlighting attivo
+- ~~`debugMode`~~ → Rimosso console.log (lint clean)
 - ~~`lineNumbers`~~ → Delegato al tema Obsidian
 - ~~`enableFolding`~~ → Feature non prioritaria
 - ~~`enableDiffMode`~~ → Feature non prioritaria
