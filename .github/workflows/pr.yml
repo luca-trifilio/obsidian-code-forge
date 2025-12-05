@@ -111,6 +111,18 @@ jobs:
           echo "beta_version=$beta_version" >> $GITHUB_OUTPUT
           echo "Beta version: $beta_version ($bump_type)"
 
+      - name: Update manifest version for beta
+        run: |
+          beta_version="${{ steps.version.outputs.beta_version }}"
+          pr_number="${{ github.event.pull_request.number }}"
+          short_sha="${GITHUB_SHA:0:7}"
+          full_beta_version="${beta_version}-beta.pr${pr_number}.${short_sha}"
+
+          # Update manifest.json with beta version
+          jq --arg v "$full_beta_version" '.version = $v' manifest.json > manifest.tmp && mv manifest.tmp manifest.json
+          echo "Updated manifest.json to version: $full_beta_version"
+          cat manifest.json
+
       - name: Create beta release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}

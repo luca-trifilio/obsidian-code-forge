@@ -4,9 +4,18 @@
 export type ThemeSource = "auto" | "bundled" | "custom";
 
 /**
- * Bundled theme names
+ * Bundled theme names (Shiki theme IDs)
  */
-export type BundledTheme = "dracula" | "solarized-dark" | "solarized-light" | "nord" | "one-dark";
+export type BundledTheme =
+  | "github-dark"
+  | "github-light"
+  | "dracula"
+  | "nord"
+  | "one-dark-pro"
+  | "solarized-dark"
+  | "solarized-light"
+  | "vitesse-dark"
+  | "vitesse-light";
 
 /**
  * Paste behavior options
@@ -116,8 +125,8 @@ export const DEFAULT_SETTINGS: CodeForgeSettings = {
   // Theme
   themeSource: "auto",
   bundledTheme: "dracula",
-  themeDark: "dracula",
-  themeLight: "solarized-light",
+  themeDark: "github-dark",
+  themeLight: "github-light",
   autoSyncTheme: true,
   tokenOverrides: {},
 

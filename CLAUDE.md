@@ -86,11 +86,12 @@ obsidian-code-forge/
 
 ## TODOs
 
-### Phase 1: Shiki Engine
-- [ ] Integrate Shiki as dependency
-- [ ] Create ShikiEngine class
-- [ ] Implement lazy grammar loading
-- [ ] Create MarkdownPostProcessor
+### Phase 1: Shiki Engine ✅
+- [x] Integrate Shiki as dependency
+- [x] Create ShikiEngine class
+- [x] Implement lazy grammar loading
+- [x] Create MarkdownPostProcessor
+- [x] CSS variables theme (adapts to Obsidian theme)
 
 ### Phase 2: Multi-mode Support
 - [ ] EditorExtension for Live Preview
@@ -119,3 +120,8 @@ obsidian-code-forge/
 - [ ] i18n (EN + IT)
 - [ ] Documentation
 - [ ] Cross-platform testing
+
+## Credits
+
+- Syntax highlighting approach inspired by [obsidian-shiki-plugin](https://github.com/mProjectsCode/obsidian-shiki-plugin) by mProjectsCode (MIT License)
+- CSS variables theme mapping based on their ObsidianTheme implementation
