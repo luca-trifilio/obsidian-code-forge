@@ -148,9 +148,19 @@ export function createShikiViewPlugin(engine: ShikiEngine) {
 
             let charOffset = 0;
 
+            // DEBUG: Log line content and tokens
+            console.log(`[DEBUG] Line ${lineIdx}: "${codeLine.text}" (from=${codeLine.from}, to=${codeLine.to})`);
+            console.log(`[DEBUG] Tokens:`, lineTokens.map(t => `"${t.content}"`).join(', '));
+
             for (const token of lineTokens) {
               const tokenStart = codeLine.from + charOffset;
               const tokenEnd = tokenStart + token.content.length;
+
+              // DEBUG: Log each token position
+              const docText = doc.sliceString(tokenStart, tokenEnd);
+              if (docText !== token.content) {
+                console.warn(`[DEBUG] MISMATCH! Token "${token.content}" vs Doc "${docText}" at ${tokenStart}-${tokenEnd}`);
+              }
 
               // Ensure within bounds
               if (tokenStart >= 0 && tokenEnd <= doc.length && tokenEnd <= codeLine.to + 1) {
