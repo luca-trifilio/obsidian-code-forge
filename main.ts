@@ -27,7 +27,9 @@ export default class CodeForgePlugin extends Plugin {
     this.registerEditorExtension(createShikiViewPlugin(this.shikiEngine));
 
     // Register paste handler for smart code paste
+    console.warn("[Code Forge] Registering paste handler...");
     this.registerEditorExtension(createPasteHandler());
+    console.warn("[Code Forge] Paste handler registered");
   }
 
   override onunload(): void {

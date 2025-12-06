@@ -61,6 +61,7 @@ function processPastedCode(text: string, baseIndent: string): string {
  * Creates an EditorView extension that handles paste events in code blocks
  */
 export function createPasteHandler() {
+  console.warn("[Code Forge] createPasteHandler() called");
   return EditorView.domEventHandlers({
     paste(event: ClipboardEvent, view: EditorView) {
       console.warn("[Code Forge] Paste event fired");
