@@ -1,7 +1,13 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git branch:*)"
+      "Bash(git branch:*)",
+      "Bash(gh issue create --title \"feat: smart paste handling in code blocks\" --body \"$(cat <<''EOF''\n## Description\nWhen pasting code into a code block, preserve original indentation and formatting.\n\n## Requirements\n- Intercept paste events in code blocks\n- Detect if cursor is inside a code block\n- Preserve whitespace/indentation from source\n- Handle tab vs spaces correctly\n\n## Technical approach\n- Use `EditorView.domEventHandlers` to intercept paste\n- Check cursor position against syntax tree\n- Process clipboard content before insertion\n\n## Priority\n🔴 High\nEOF\n)\" --label \"enhancement\")",
+      "Bash(gh issue create:*)",
+      "Bash(__NEW_LINE__ gh issue create --title \"feat: line highlighting\" --body \"$(cat <<''EOF''\n## Description\nHighlight specific lines in code blocks using syntax like \\`\\`\\`js {1,3-5}\n\n## Requirements\n- Parse line range from code fence\n- Apply highlight style to specified lines\n- Support single lines and ranges\n\n## Priority\n🟢 Low\nEOF\n)\" --label \"enhancement\")",
+      "Bash(__NEW_LINE__ gh issue create --title \"feat: copy button for code blocks\" --body \"$(cat <<''EOF''\n## Description\nOne-click copy button for code blocks.\n\n## Requirements\n- Copy icon/button\n- Visual feedback on success\n- Works in Read mode\n\n## Priority\n🟢 Low (many themes already provide this)\nEOF\n)\" --label \"enhancement\")",
+      "Bash(__NEW_LINE__ gh issue create --title \"feat: code block folding\" --body \"$(cat <<''EOF''\n## Description\nCollapse/expand long code blocks.\n\n## Requirements\n- Fold toggle button\n- Remember fold state\n- Works in Read mode\n\n## Priority\n🟢 Low (future consideration)\nEOF\n)\" --label \"enhancement\")",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

@@ -3,6 +3,7 @@ import { CodeForgeSettings, DEFAULT_SETTINGS } from "@/types/settings";
 import { CodeForgeSettingTab } from "@/ui/settings-tab";
 import { ShikiEngine, createShikiPostProcessor } from "@/engine";
 import { createShikiViewPlugin } from "@/editor";
+import { createPasteHandler } from "@/paste";
 
 export default class CodeForgePlugin extends Plugin {
   settings: CodeForgeSettings = DEFAULT_SETTINGS;
@@ -25,7 +26,8 @@ export default class CodeForgePlugin extends Plugin {
     // Register editor extension for Live Preview / Source mode highlighting
     this.registerEditorExtension(createShikiViewPlugin(this.shikiEngine));
 
-    // TODO: Phase 3 - Register paste handlers
+    // Register paste handler for smart code paste
+    this.registerEditorExtension(createPasteHandler());
   }
 
   override onunload(): void {
