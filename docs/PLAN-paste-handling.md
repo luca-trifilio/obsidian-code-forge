@@ -1,4 +1,4 @@
-# Piano: Smart Paste Handling
+# Piano: Smart Paste Handling ✅ COMPLETATO
 
 ## Problema
 
@@ -7,214 +7,9 @@ Quando si incolla codice in un code block, Obsidian/CodeMirror:
 - Non riconosce che siamo in un code block
 - Applica auto-indent del markdown invece del codice
 
-## Obiettivo
+## Soluzione Implementata
 
-Preservare l'indentazione e la formattazione originale del codice incollato.
-
----
-
-## Analisi Tecnica
-
-### Come funziona il paste in CodeMirror 6
-
-1. L'evento `paste` viene intercettato dal DOM
-2. CodeMirror processa il contenuto della clipboard
-3. Viene applicato l'auto-indent basato sul contesto
-
-### Come intercettare
-
-```typescript
-EditorView.domEventHandlers({
-  paste(event: ClipboardEvent, view: EditorView) {
-    // Intercetta qui
-    // return true per bloccare comportamento default
-  }
-})
-```
-
-### Come detectare se siamo in un code block
-
-Usando il syntax tree (stesso approccio di ShikiViewPlugin):
-
-```typescript
-import { syntaxTree } from "@codemirror/language";
-
-function isInsideCodeBlock(view: EditorView): boolean {
-  const pos = view.state.selection.main.head;
-  const tree = syntaxTree(view.state);
-
-  let inCodeBlock = false;
-  tree.iterate({
-    enter: (node) => {
-      if (node.name.includes("codeblock") &&
-          node.from <= pos && pos <= node.to) {
-        inCodeBlock = true;
-      }
-    }
-  });
-
-  return inCodeBlock;
-}
-```
-
----
-
-## Implementazione
-
-### File da creare
-
-```
-src/paste/
-├── PasteHandler.ts      # Logica principale
-├── indentation.ts       # Utility per indentazione
-└── index.ts             # Export
-```
-
-### Step 1: PasteHandler base
-
-```typescript
-// src/paste/PasteHandler.ts
-
-import { EditorView } from "@codemirror/view";
-import { syntaxTree } from "@codemirror/language";
-
-export function createPasteHandler() {
-  return EditorView.domEventHandlers({
-    paste(event: ClipboardEvent, view: EditorView) {
-      // 1. Check se siamo in un code block
-      if (!isInsideCodeBlock(view)) {
-        return false; // Comportamento default
-      }
-
-      // 2. Ottieni testo dalla clipboard
-      const text = event.clipboardData?.getData("text/plain");
-      if (!text) return false;
-
-      // 3. Processa e inserisci
-      const processed = processCodePaste(text, view);
-
-      // 4. Inserisci nel documento
-      view.dispatch({
-        changes: {
-          from: view.state.selection.main.from,
-          to: view.state.selection.main.to,
-          insert: processed
-        }
-      });
-
-      // 5. Blocca comportamento default
-      event.preventDefault();
-      return true;
-    }
-  });
-}
-```
-
-### Step 2: Detect code block
-
-```typescript
-function isInsideCodeBlock(view: EditorView): boolean {
-  const pos = view.state.selection.main.head;
-  const tree = syntaxTree(view.state);
-
-  let result = false;
-
-  tree.iterate({
-    enter: (node) => {
-      // Code block content (non begin/end)
-      if (node.name === "HyperMD-codeblock_HyperMD-codeblock-bg" &&
-          node.from <= pos && pos <= node.to) {
-        result = true;
-      }
-    }
-  });
-
-  return result;
-}
-```
-
-### Step 3: Processare il codice incollato
-
-```typescript
-function processCodePaste(text: string, view: EditorView): string {
-  // Ottieni indentazione corrente della linea
-  const pos = view.state.selection.main.head;
-  const line = view.state.doc.lineAt(pos);
-  const currentIndent = getLeadingWhitespace(line.text);
-
-  // Normalizza il codice incollato
-  const lines = text.split('\n');
-
-  // Se è una sola linea, inserisci così com'è
-  if (lines.length === 1) {
-    return text;
-  }
-
-  // Per multi-linea: mantieni indentazione relativa
-  const firstLineIndent = getLeadingWhitespace(lines[0]);
-
-  return lines.map((line, i) => {
-    if (i === 0) {
-      // Prima linea: inserisci così com'è (cursor già posizionato)
-      return line;
-    }
-
-    // Altre linee: rimuovi indent comune, aggiungi indent corrente
-    const lineIndent = getLeadingWhitespace(line);
-    const relativeIndent = lineIndent.slice(firstLineIndent.length);
-    return currentIndent + relativeIndent + line.trimStart();
-  }).join('\n');
-}
-
-function getLeadingWhitespace(text: string): string {
-  const match = text.match(/^(\s*)/);
-  return match ? match[1] : '';
-}
-```
-
-### Step 4: Registrare l'extension
-
-```typescript
-// main.ts
-
-import { createPasteHandler } from "./paste";
-
-// In onload():
-this.registerEditorExtension(createPasteHandler());
-```
-
----
-
-## Edge Cases da gestire
-
-1. **Selezione multipla**: paste con più cursori
-2. **Paste su selezione**: sostituire testo selezionato
-3. **Tab vs Spaces**: rispettare le impostazioni dell'editor
-4. **Code block vuoto**: prima linea dopo ```
-5. **Paste da IDE**: preservare formattazione ricca?
-
----
-
-## Testing
-
-### Unit tests
-
-```typescript
-describe("PasteHandler", () => {
-  it("should preserve indentation for multi-line paste");
-  it("should not modify single-line paste");
-  it("should handle mixed tabs and spaces");
-  it("should work with empty lines");
-});
-```
-
-### Manual tests
-
-- [ ] Paste codice da VSCode
-- [ ] Paste codice da browser
-- [ ] Paste in code block vuoto
-- [ ] Paste con selezione attiva
-- [ ] Paste multi-linea con indent variabile
+Intercettare paste events nei code blocks e normalizzare l'indentazione.
 
 ---
 
@@ -226,12 +21,76 @@ describe("PasteHandler", () => {
 
 ---
 
-## Timeline
+## File Creati
 
-1. [ ] Creare struttura file `src/paste/`
-2. [ ] Implementare `isInsideCodeBlock()`
-3. [ ] Implementare `processCodePaste()` base
-4. [ ] Registrare extension in main.ts
-5. [ ] Test manuale
-6. [ ] Gestire edge cases
-7. [ ] Unit tests
+```
+src/paste/
+├── PasteHandler.ts      # Logica principale (EditorView.domEventHandlers)
+├── indentation.ts       # Utility per indentazione
+└── index.ts             # Export
+```
+
+---
+
+## Implementazione
+
+### PasteHandler.ts
+
+- `createPasteHandler()` - Extension per CodeMirror 6
+- `isInsideCodeBlock()` - Detect code block via syntax tree
+- `getBaseIndent()` - Ottieni indentazione corrente
+- `processPastedCode()` - Normalizza il codice incollato
+
+### indentation.ts
+
+- `INDENT_SIZE = 2` - Dimensione indent standard
+- `getLeadingWhitespace()` - Estrae whitespace iniziale
+- `tabsToSpaces()` - Converte tab → 2 spazi
+- `getIndentLevel()` - Calcola livello indentazione
+- `createIndent()` - Crea stringa indent
+- `normalizeIndentation()` - Normalizza codice multi-linea
+
+---
+
+## Algoritmo normalizeIndentation
+
+1. Converti tutti i tab in 2 spazi
+2. Trova l'indentazione minima comune (ignorando linee vuote)
+3. Rimuovi l'indentazione comune da tutte le linee
+4. Aggiungi base indent alle linee successive (non alla prima)
+5. Preserva linee vuote senza aggiungere indent
+
+---
+
+## Test
+
+43 unit test in `tests/indentation.test.ts`:
+
+- ✅ getLeadingWhitespace (6 test)
+- ✅ tabsToSpaces (6 test)
+- ✅ getIndentLevel (6 test)
+- ✅ createIndent (4 test)
+- ✅ normalizeIndentation single line (2 test)
+- ✅ normalizeIndentation multi-line (8 test)
+- ✅ normalizeIndentation empty lines (3 test)
+- ✅ normalizeIndentation edge cases (4 test)
+- ✅ normalizeIndentation real-world examples (4 test)
+
+---
+
+## Integrazione
+
+```typescript
+// main.ts
+import { createPasteHandler } from "@/paste";
+
+this.registerEditorExtension(createPasteHandler());
+```
+
+---
+
+## PR
+
+- PR #10: https://github.com/luca-trifilio/obsidian-code-forge/pull/10
+- Closes Issue #4
+- Label: `release:minor`
