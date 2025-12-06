@@ -46,17 +46,24 @@ Supporto per Source mode e Live Preview (non solo Reading view).
 
 ---
 
-### Fase 3: Paste Handling (PLANNED)
+### Fase 3: Paste Handling ✅ COMPLETATA
 
 Smart paste che preserva indentazione nel code block.
 
-**Tasks**:
-- [ ] Intercettare paste via EditorView.domEventHandlers
-- [ ] Detectare se cursore è dentro code block
-- [ ] Preservare whitespace/indentazione originale
+**Completato**:
+- [x] ViewPlugin con capture phase per intercettare paste prima di Obsidian
+- [x] Detect cursore dentro code block via syntax tree
+- [x] Normalizzazione indentazione (tab → 2 spazi)
+- [x] Rimozione indent comune, preserva relativo
+- [x] 43 unit test per indentation utilities
 
-**File da creare**:
-- `src/paste/PasteHandler.ts`
+**Release**: `0.3.0` (pending PR #10)
+
+**File chiave**:
+- `src/paste/PasteHandler.ts` - ViewPlugin con paste listener
+- `src/paste/indentation.ts` - Utility per normalizzazione
+
+**Nota tecnica**: `EditorView.domEventHandlers` non funziona in Obsidian perché intercetta paste prima. Soluzione: ViewPlugin con `addEventListener("paste", handler, true)` (capture phase).
 
 ---
 

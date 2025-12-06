@@ -50,61 +50,42 @@ function processPastedCode(text: string, baseIndent: string): string {
 }
 
 /**
- * Creates a ViewPlugin that manually attaches a paste event listener
- * with capture phase to intercept before Obsidian
+ * Creates a ViewPlugin that intercepts paste events in code blocks
+ * Uses capture phase to intercept before Obsidian's default handling
  */
 export function createPasteHandler() {
-  console.warn("[Code Forge] createPasteHandler() called");
-
   return ViewPlugin.fromClass(
     class {
       private handlePaste: (event: ClipboardEvent) => void;
 
       constructor(private view: EditorView) {
         this.handlePaste = (event: ClipboardEvent) => {
-          console.warn("[Code Forge] Capture paste event fired");
-
           const pos = this.view.state.selection.main.head;
-          const insideCodeBlock = isInsideCodeBlock(this.view, pos);
-          console.warn("[Code Forge] Inside code block:", insideCodeBlock);
 
-          if (!insideCodeBlock) {
+          if (!isInsideCodeBlock(this.view, pos)) {
             return; // Let default handler process
           }
 
-          // Get plain text from clipboard
           const text = event.clipboardData?.getData("text/plain");
           if (!text) {
             return;
           }
 
-          console.warn("[Code Forge] Text length:", text.length);
-
-          // Get base indentation from current line
           const baseIndent = getBaseIndent(this.view);
-          console.warn("[Code Forge] Base indent:", JSON.stringify(baseIndent));
-
-          // Process the pasted code
           const processed = processPastedCode(text, baseIndent);
-          console.warn("[Code Forge] Processed:", processed.slice(0, 100));
-
-          // Get current selection
           const { from, to } = this.view.state.selection.main;
 
-          // Insert processed text, replacing any selection
           this.view.dispatch({
             changes: { from, to, insert: processed },
             selection: { anchor: from + processed.length },
           });
 
-          // Prevent default paste behavior
           event.preventDefault();
           event.stopPropagation();
         };
 
         // Attach with capture phase to intercept before Obsidian
         this.view.dom.addEventListener("paste", this.handlePaste, true);
-        console.warn("[Code Forge] Paste listener attached with capture");
       }
 
       update(_update: ViewUpdate) {
@@ -113,7 +94,6 @@ export function createPasteHandler() {
 
       destroy() {
         this.view.dom.removeEventListener("paste", this.handlePaste, true);
-        console.warn("[Code Forge] Paste listener removed");
       }
     }
   );
