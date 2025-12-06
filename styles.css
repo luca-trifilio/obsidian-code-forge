@@ -40,7 +40,39 @@
 }
 
 /* ==========================================================================
-   Shiki Highlighted Code Blocks
+   Edit Mode - CodeMirror Token Styling
+   ========================================================================== */
+
+/*
+ * In Edit mode (Live Preview / Source mode), we use CodeMirror decorations
+ * to apply Shiki highlighting. These rules ensure our colors override
+ * any default CodeMirror/Obsidian syntax highlighting.
+ */
+
+/* Token decoration - must override CM6 default colors */
+.code-forge-token {
+  /* Reset any inherited color styling */
+  color: inherit;
+}
+
+/*
+ * CodeMirror applies syntax highlighting via cm-* classes.
+ * We need to ensure our inline styles take precedence.
+ * The inline style="color: var(--shiki-code-*)" should work,
+ * but some themes use !important, so we add specificity here.
+ */
+.cm-line .code-forge-token {
+  /* Let inline style apply - ensure no overrides */
+  -webkit-text-fill-color: unset;
+}
+
+/* Ensure our highlighting overrides Obsidian's default code block styling */
+.HyperMD-codeblock .code-forge-token {
+  /* The inline style handles the actual color */
+}
+
+/* ==========================================================================
+   Shiki Highlighted Code Blocks (Read Mode)
    ========================================================================== */
 
 /*

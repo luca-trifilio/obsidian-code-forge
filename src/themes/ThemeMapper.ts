@@ -106,4 +106,27 @@ export class ThemeMapper {
   getMappingCount(): number {
     return this.mapping.size;
   }
+
+  /**
+   * Convert a placeholder hex color back to CSS variable.
+   * Used for token-based rendering (Edit mode).
+   *
+   * @param placeholder - The placeholder hex color (e.g., "#000001")
+   * @returns The CSS variable (e.g., "var(--shiki-code-keyword)") or undefined if not found
+   */
+  placeholderToCssVar(placeholder: string | undefined): string | undefined {
+    if (!placeholder) return undefined;
+
+    // Normalize to uppercase for comparison
+    const normalized = placeholder.toUpperCase();
+
+    for (const [cssVar, hex] of this.mapping) {
+      if (hex === normalized) {
+        return cssVar;
+      }
+    }
+
+    // Return undefined if not found - caller should handle fallback
+    return undefined;
+  }
 }

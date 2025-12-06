@@ -2,6 +2,7 @@ import { Plugin } from "obsidian";
 import { CodeForgeSettings, DEFAULT_SETTINGS } from "@/types/settings";
 import { CodeForgeSettingTab } from "@/ui/settings-tab";
 import { ShikiEngine, createShikiPostProcessor } from "@/engine";
+import { createShikiViewPlugin } from "@/editor";
 
 export default class CodeForgePlugin extends Plugin {
   settings: CodeForgeSettings = DEFAULT_SETTINGS;
@@ -21,9 +22,10 @@ export default class CodeForgePlugin extends Plugin {
       createShikiPostProcessor(this.shikiEngine)
     );
 
-    // TODO: Phase 2 - Register editor extensions for multi-mode support
+    // Register editor extension for Live Preview / Source mode highlighting
+    this.registerEditorExtension(createShikiViewPlugin(this.shikiEngine));
+
     // TODO: Phase 3 - Register paste handlers
-    // TODO: Phase 4 - Register UI components (header, copy button, etc.)
   }
 
   override onunload(): void {
