@@ -1,0 +1,1 @@
+export { createPasteHandler } from "./PasteHandler";

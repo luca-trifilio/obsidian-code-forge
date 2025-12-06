@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Code Forge is an Obsidian plugin that provides modern syntax highlighting using Shiki, with a clean UI for code blocks.
+Code Forge is an Obsidian plugin that provides modern syntax highlighting using Shiki, with consistent colors across Read and Edit modes.
 
 ## Quick Start
 
@@ -24,19 +24,24 @@ obsidian-code-forge/
 │   │   └── settings.ts          # Settings interface (minimal)
 │   ├── engine/                  # Shiki highlighting engine
 │   │   ├── shiki-engine.ts      # Core engine with lazy loading
-│   │   ├── post-processor.ts    # MarkdownPostProcessor
-│   │   └── languages.ts         # Bundled languages list
+│   │   ├── post-processor.ts    # MarkdownPostProcessor (Read mode)
+│   │   └── index.ts             # Exports
+│   ├── editor/                  # CodeMirror 6 integration
+│   │   ├── ShikiViewPlugin.ts   # ViewPlugin for Edit mode
+│   │   └── index.ts             # Exports
 │   ├── themes/                  # Theme system
 │   │   ├── ObsidianTheme.ts     # TextMate scope → CSS var mappings
 │   │   ├── ThemeMapper.ts       # Placeholder hex → CSS var replacement
 │   │   └── index.ts             # Exports
-│   ├── ui/                      # UI components
-│   │   ├── components/          # Header, copy button (Phase 2)
-│   │   ├── icons/               # Language icons (Phase 2)
-│   │   └── settings-tab.ts      # Settings UI
-│   └── paste/                   # Paste handling (Phase 3)
+│   ├── paste/                   # Paste handling
+│   │   ├── PasteHandler.ts      # ViewPlugin with capture phase
+│   │   ├── indentation.ts       # Indentation normalization
+│   │   └── index.ts             # Exports
+│   └── ui/                      # UI components
+│       └── settings-tab.ts      # Settings UI
 ├── tests/                       # Test files
-│   └── __mocks__/               # Obsidian API mocks
+│   ├── __mocks__/               # Obsidian API mocks
+│   └── indentation.test.ts      # Paste indentation tests
 ├── docs/                        # Documentation
 │   └── PROJECT_PLAN.md          # Detailed project plan
 └── .github/workflows/           # CI/CD pipelines
@@ -66,20 +71,26 @@ obsidian-code-forge/
 
 - **Theme**: CSS variables that adapt to active Obsidian theme (no bundled themes)
 - **Bundle Strategy**: Top 20 languages bundled, others lazy-loaded
-- **Settings**: Minimal - only `showCopyButton` exposed to user
-- **UI**: Header always visible with language icon + name + copy button
+- **Settings**: Minimal - no user-facing settings currently
+- **Paste**: ViewPlugin with capture phase (Obsidian intercepts paste before domEventHandlers)
 
 ## Architecture
 
 ### Shiki Integration
 - ShikiEngine class with lazy grammar loading
 - MarkdownPostProcessor for Reading view
+- ShikiViewPlugin (CodeMirror 6) for Edit mode
 - Cache for performance (internal, not configurable)
 
 ### Theme System (CSS Variables)
 - ObsidianTheme defines TextMate scope → CSS variable mappings
 - ThemeMapper replaces CSS vars with placeholder hex for Shiki, then restores
 - Fallback colors in styles.css for themes that don't define `--shiki-code-*`
+
+### Paste Handling
+- ViewPlugin with manual `addEventListener("paste", handler, true)`
+- Capture phase required to intercept before Obsidian
+- Normalizes tabs to 2 spaces, removes common indent
 
 ### CSS Variables Used
 ```css
@@ -103,20 +114,19 @@ obsidian-code-forge/
 - [x] CSS variables theme (ObsidianTheme + ThemeMapper)
 - [x] Fallback colors in styles.css
 
-### Phase 2: UI Components 🔄 CURRENT
-- [ ] Header component (icon + language name)
-- [ ] Copy button with feedback
-- [ ] Container wrapper
+### Phase 2: Edit Mode ✅ DONE
+- [x] ShikiViewPlugin for CodeMirror 6
+- [x] Syntax tree parsing for code blocks
+- [x] Token-to-decoration mapping
+- [x] Color consistency with Read mode
 
-### Phase 3: Paste Handling
-- [ ] Intercept paste in code blocks
-- [ ] Preserve indentation
+### Phase 3: Paste Handling ✅ DONE
+- [x] ViewPlugin with capture phase
+- [x] Code block detection via syntax tree
+- [x] Indentation normalization (tabs → 2 spaces)
+- [x] 43 unit tests
 
-### Phase 4: Live Preview Support
-- [ ] EditorExtension for CodeMirror 6
-- [ ] Source mode decorations
-
-### Phase 5: Polish & Release
+### Phase 4: Polish & Release
 - [ ] Cross-platform testing
 - [ ] Documentation
 - [ ] Community plugin submission
