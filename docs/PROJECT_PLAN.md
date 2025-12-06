@@ -22,50 +22,31 @@ Integrazione di Shiki con tema CSS variables che si adatta al tema Obsidian atti
 - [x] CI/CD con beta release automatiche via BRAT
 - [x] Settings semplificati
 
-**Releases**:
-- `0.1.0` - Initial Shiki integration
-- `0.1.1` - Settings cleanup, removed debug logging
-
-**File chiave**:
-- `src/engine/shiki-engine.ts` - Core engine
-- `src/themes/ObsidianTheme.ts` - TextMate scope mappings
-- `src/themes/ThemeMapper.ts` - Placeholder → CSS var replacement
+**Releases**: `0.1.0`, `0.1.1`
 
 ---
 
-### Fase 2: Live Preview / Edit Mode 🔄 IN CORSO
+### Fase 2: Live Preview / Edit Mode ✅ COMPLETATA
 
 Supporto per Source mode e Live Preview (non solo Reading view).
 
 **Completato**:
-- [x] EditorExtension per CodeMirror 6
-- [x] ViewPlugin per rendering code blocks
-- [x] Decorations per Source mode
-- [x] Sync con ShikiEngine esistente
-- [x] Posizioni token corrette
-- [x] Colori CSS variables allineati con Read mode
+- [x] ShikiViewPlugin per CodeMirror 6
+- [x] Parsing syntax tree per identificare code blocks
+- [x] Nodi corretti: `HyperMD-codeblock_HyperMD-codeblock-bg` per linee
+- [x] Decorazioni mark con colori CSS variables
+- [x] Conversione placeholder → CSS var via ThemeMapper
+- [x] Colori identici tra Read e Edit mode
+- [x] Gestione duplicati e posizioni corrette
 
-**In corso**:
-- [ ] **Testing** - Verificare che colori siano identici in entrambi i mode
+**Release**: `0.2.0`
 
-**Soluzione implementata**:
-1. `ThemeMapper.placeholderToCssVar()` ora ritorna `undefined` se placeholder non trovato
-2. `ShikiViewPlugin` usa fallback `var(--shiki-code-normal)` per token senza colore
-3. CSS specifico per `.code-forge-token` in Edit mode (styles.css)
-
-Questo assicura che:
-- Tutti i token abbiano sempre un colore CSS variable
-- Il fallback sia consistente con Read mode (`--shiki-code-normal`)
-- Le decorazioni CM6 abbiano priorità sui colori default dell'editor
-
-**File**:
-- `src/editor/ShikiViewPlugin.ts` - ViewPlugin con decorazioni e fallback colori
-- `src/themes/ThemeMapper.ts` - Conversione placeholder → CSS var
-- `styles.css` - Regole CSS per Edit mode
+**File chiave**:
+- `src/editor/ShikiViewPlugin.ts` - ViewPlugin con decorazioni
 
 ---
 
-### Fase 3: Paste Handling
+### Fase 3: Paste Handling (PLANNED)
 
 Smart paste che preserva indentazione nel code block.
 
@@ -79,7 +60,7 @@ Smart paste che preserva indentazione nel code block.
 
 ---
 
-### Fase 4: Polish & Release
+### Fase 4: Polish & Release (PLANNED)
 
 - [ ] Testing cross-platform (desktop + mobile)
 - [ ] Performance profiling
@@ -92,26 +73,7 @@ Smart paste che preserva indentazione nel code block.
 
 **Filosofia**: Meno è meglio. Il plugin funziona out-of-the-box.
 
-### Settings interni (non esposti)
-
-| Setting | Tipo | Default | Descrizione |
-|---------|------|---------|-------------|
-| `cacheEnabled` | boolean | `true` | Cache per performance |
-| `cacheMaxSize` | number | `100` | Max entries in cache |
-
-### Rimossi
-
-- ~~`themeSource`~~ → Usiamo sempre CSS variables
-- ~~`bundledTheme`~~ → Non più necessario
-- ~~`themeDark/themeLight`~~ → CSS variables si adattano
-- ~~`tokenOverrides`~~ → Tema definisce i colori
-- ~~`enabled`~~ → Ridondante (Obsidian ha già toggle plugin)
-- ~~`highlightingEnabled`~~ → Se plugin attivo, highlighting attivo
-- ~~`debugMode`~~ → Rimosso console.log
-- ~~`lineNumbers`~~ → Delegato al tema Obsidian
-- ~~`showCopyButton`~~ → Delegato al tema (Baseline ha già questa feature)
-- ~~`enableFolding`~~ → Feature non prioritaria
-- ~~`enableDiffMode`~~ → Feature non prioritaria
+Attualmente nessun setting esposto all'utente. Il plugin si attiva e funziona.
 
 ---
 
