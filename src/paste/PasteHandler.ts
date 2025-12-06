@@ -17,9 +17,15 @@ function isInsideCodeBlock(view: EditorView): boolean {
   const tree = syntaxTree(view.state);
 
   let result = false;
+  const foundNodes: string[] = [];
 
   tree.iterate({
     enter: (node) => {
+      // Log nodes that contain the cursor position
+      if (node.from <= pos && pos <= node.to) {
+        foundNodes.push(node.name);
+      }
+
       // Match code block content lines (not begin/end fences)
       if (
         node.name === "HyperMD-codeblock_HyperMD-codeblock-bg" &&
@@ -31,6 +37,7 @@ function isInsideCodeBlock(view: EditorView): boolean {
     },
   });
 
+  console.warn("[Code Forge] Nodes at cursor:", foundNodes);
   return result;
 }
 
@@ -56,8 +63,13 @@ function processPastedCode(text: string, baseIndent: string): string {
 export function createPasteHandler() {
   return EditorView.domEventHandlers({
     paste(event: ClipboardEvent, view: EditorView) {
+      console.warn("[Code Forge] Paste event fired");
+
       // Only handle paste inside code blocks
-      if (!isInsideCodeBlock(view)) {
+      const insideCodeBlock = isInsideCodeBlock(view);
+      console.warn("[Code Forge] Inside code block:", insideCodeBlock);
+
+      if (!insideCodeBlock) {
         return false;
       }
 
