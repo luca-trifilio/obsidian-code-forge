@@ -79,6 +79,11 @@ export function createShikiViewPlugin(engine: ShikiEngine) {
         enter: (node) => {
           const name = node.name;
 
+          // DEBUG: Log all codeblock-related nodes
+          if (name.includes("codeblock")) {
+            console.warn(`[DEBUG] Node: "${name}" from=${node.from} to=${node.to} text="${doc.sliceString(node.from, node.to).slice(0, 30)}..."`);
+          }
+
           // Start of code block (```)
           if (name === "HyperMD-codeblock-begin" || name.includes("codeblock-begin")) {
             const lineText = doc.sliceString(node.from, node.to);
