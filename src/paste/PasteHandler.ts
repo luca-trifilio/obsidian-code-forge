@@ -10,22 +10,15 @@ import { syntaxTree } from "@codemirror/language";
 import { getLeadingWhitespace, normalizeIndentation } from "./indentation";
 
 /**
- * Check if the cursor is inside a code block
+ * Check if a position is inside a code block
  */
-function isInsideCodeBlock(view: EditorView): boolean {
-  const pos = view.state.selection.main.head;
+function isInsideCodeBlock(view: EditorView, pos: number): boolean {
   const tree = syntaxTree(view.state);
 
   let result = false;
-  const foundNodes: string[] = [];
 
   tree.iterate({
     enter: (node) => {
-      // Log nodes that contain the cursor position
-      if (node.from <= pos && pos <= node.to) {
-        foundNodes.push(node.name);
-      }
-
       // Match code block content lines (not begin/end fences)
       if (
         node.name === "HyperMD-codeblock_HyperMD-codeblock-bg" &&
@@ -37,7 +30,6 @@ function isInsideCodeBlock(view: EditorView): boolean {
     },
   });
 
-  console.warn("[Code Forge] Nodes at cursor:", foundNodes);
   return result;
 }
 
@@ -59,35 +51,35 @@ function processPastedCode(text: string, baseIndent: string): string {
 
 /**
  * Creates an EditorView extension that handles paste events in code blocks
+ * Uses inputHandler which intercepts text input including paste
  */
 export function createPasteHandler() {
   console.warn("[Code Forge] createPasteHandler() called");
-  return EditorView.domEventHandlers({
-    paste(event: ClipboardEvent, view: EditorView) {
-      console.warn("[Code Forge] Paste event fired");
 
-      // Only handle paste inside code blocks
-      const insideCodeBlock = isInsideCodeBlock(view);
-      console.warn("[Code Forge] Inside code block:", insideCodeBlock);
-
-      if (!insideCodeBlock) {
+  return EditorView.inputHandler.of(
+    (view: EditorView, from: number, to: number, text: string) => {
+      // Only intercept multi-line input (likely paste)
+      if (!text.includes("\n")) {
         return false;
       }
 
-      // Get plain text from clipboard
-      const text = event.clipboardData?.getData("text/plain");
-      if (!text) {
-        return false;
+      console.warn("[Code Forge] inputHandler fired, text length:", text.length);
+
+      // Only handle paste inside code blocks
+      const insideCodeBlock = isInsideCodeBlock(view, from);
+      console.warn("[Code Forge] Inside code block:", insideCodeBlock);
+
+      if (!insideCodeBlock) {
+        return false; // Let default handler process
       }
 
       // Get base indentation from current line
       const baseIndent = getBaseIndent(view);
+      console.warn("[Code Forge] Base indent:", JSON.stringify(baseIndent));
 
       // Process the pasted code
       const processed = processPastedCode(text, baseIndent);
-
-      // Get current selection
-      const { from, to } = view.state.selection.main;
+      console.warn("[Code Forge] Processed text:", processed.slice(0, 100));
 
       // Insert processed text, replacing any selection
       view.dispatch({
@@ -95,9 +87,7 @@ export function createPasteHandler() {
         selection: { anchor: from + processed.length },
       });
 
-      // Prevent default paste behavior
-      event.preventDefault();
-      return true;
-    },
-  });
+      return true; // We handled it
+    }
+  );
 }
