@@ -97,11 +97,12 @@ export function createShikiViewPlugin(engine: ShikiEngine) {
             };
           }
 
-          // Code content line - only exact match, not child nodes
-          // Use exact name match to avoid capturing nested/child nodes
+          // Code content line - match the line-level node, not token nodes
+          // Line nodes are exactly "HyperMD-codeblock_HyperMD-codeblock-bg"
+          // Begin/end nodes have additional suffixes like "-begin" or "-end"
           if (
             currentBlock &&
-            name === "HyperMD-codeblock" &&
+            name === "HyperMD-codeblock_HyperMD-codeblock-bg" &&
             !currentBlock.seenPositions.has(node.from)
           ) {
             currentBlock.seenPositions.add(node.from);
