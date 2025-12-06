@@ -1,6 +1,6 @@
 {
   "name": "obsidian-code-forge",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Modern syntax highlighting, smart paste, and advanced UI for code blocks",
   "main": "main.js",
   "scripts": {
