@@ -5,7 +5,7 @@
  * the original indentation of the pasted code.
  */
 
-import { EditorView } from "@codemirror/view";
+import { EditorView, ViewPlugin, ViewUpdate } from "@codemirror/view";
 import { syntaxTree } from "@codemirror/language";
 import { getLeadingWhitespace, normalizeIndentation } from "./indentation";
 
@@ -50,44 +50,71 @@ function processPastedCode(text: string, baseIndent: string): string {
 }
 
 /**
- * Creates an EditorView extension that handles paste events in code blocks
- * Uses inputHandler which intercepts text input including paste
+ * Creates a ViewPlugin that manually attaches a paste event listener
+ * with capture phase to intercept before Obsidian
  */
 export function createPasteHandler() {
   console.warn("[Code Forge] createPasteHandler() called");
 
-  return EditorView.inputHandler.of(
-    (view: EditorView, from: number, to: number, text: string) => {
-      // Only intercept multi-line input (likely paste)
-      if (!text.includes("\n")) {
-        return false;
+  return ViewPlugin.fromClass(
+    class {
+      private handlePaste: (event: ClipboardEvent) => void;
+
+      constructor(private view: EditorView) {
+        this.handlePaste = (event: ClipboardEvent) => {
+          console.warn("[Code Forge] Capture paste event fired");
+
+          const pos = this.view.state.selection.main.head;
+          const insideCodeBlock = isInsideCodeBlock(this.view, pos);
+          console.warn("[Code Forge] Inside code block:", insideCodeBlock);
+
+          if (!insideCodeBlock) {
+            return; // Let default handler process
+          }
+
+          // Get plain text from clipboard
+          const text = event.clipboardData?.getData("text/plain");
+          if (!text) {
+            return;
+          }
+
+          console.warn("[Code Forge] Text length:", text.length);
+
+          // Get base indentation from current line
+          const baseIndent = getBaseIndent(this.view);
+          console.warn("[Code Forge] Base indent:", JSON.stringify(baseIndent));
+
+          // Process the pasted code
+          const processed = processPastedCode(text, baseIndent);
+          console.warn("[Code Forge] Processed:", processed.slice(0, 100));
+
+          // Get current selection
+          const { from, to } = this.view.state.selection.main;
+
+          // Insert processed text, replacing any selection
+          this.view.dispatch({
+            changes: { from, to, insert: processed },
+            selection: { anchor: from + processed.length },
+          });
+
+          // Prevent default paste behavior
+          event.preventDefault();
+          event.stopPropagation();
+        };
+
+        // Attach with capture phase to intercept before Obsidian
+        this.view.dom.addEventListener("paste", this.handlePaste, true);
+        console.warn("[Code Forge] Paste listener attached with capture");
       }
 
-      console.warn("[Code Forge] inputHandler fired, text length:", text.length);
-
-      // Only handle paste inside code blocks
-      const insideCodeBlock = isInsideCodeBlock(view, from);
-      console.warn("[Code Forge] Inside code block:", insideCodeBlock);
-
-      if (!insideCodeBlock) {
-        return false; // Let default handler process
+      update(_update: ViewUpdate) {
+        // No updates needed
       }
 
-      // Get base indentation from current line
-      const baseIndent = getBaseIndent(view);
-      console.warn("[Code Forge] Base indent:", JSON.stringify(baseIndent));
-
-      // Process the pasted code
-      const processed = processPastedCode(text, baseIndent);
-      console.warn("[Code Forge] Processed text:", processed.slice(0, 100));
-
-      // Insert processed text, replacing any selection
-      view.dispatch({
-        changes: { from, to, insert: processed },
-        selection: { anchor: from + processed.length },
-      });
-
-      return true; // We handled it
+      destroy() {
+        this.view.dom.removeEventListener("paste", this.handlePaste, true);
+        console.warn("[Code Forge] Paste listener removed");
+      }
     }
   );
 }
