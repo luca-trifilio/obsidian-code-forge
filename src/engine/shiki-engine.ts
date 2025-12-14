@@ -3,6 +3,7 @@ import {
   type Highlighter,
   type BundledLanguage,
 } from "shiki";
+import { createJavaScriptRegexEngine } from "shiki/engine/javascript";
 import { ThemeMapper, OBSIDIAN_THEME_IDENTIFIER } from "../themes";
 
 /**
@@ -98,9 +99,13 @@ export class ShikiEngine {
     // Get theme with placeholder hex colors for Shiki
     const mappedTheme = this.themeMapper.getMappedTheme();
 
+    // Use JavaScript engine instead of WASM for mobile compatibility
+    const jsEngine = createJavaScriptRegexEngine();
+
     this.initPromise = createHighlighter({
       themes: [mappedTheme],
       langs: BUNDLED_LANGUAGES,
+      engine: jsEngine,
     }).then((highlighter) => {
       this.highlighter = highlighter;
       BUNDLED_LANGUAGES.forEach((lang) => this.loadedLanguages.add(lang));
