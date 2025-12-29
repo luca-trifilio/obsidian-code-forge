@@ -11,32 +11,32 @@
  * Theme authors can override these by defining the variables in their theme.
  */
 
-/* Dark mode fallback */
+/* Dark mode - uses theme's --code-* variables with Dracula fallbacks */
 .theme-dark {
-  --shiki-code-background: #282a36;
-  --shiki-code-normal: #f8f8f2;
-  --shiki-code-keyword: #ff79c6;
-  --shiki-code-function: #50fa7b;
-  --shiki-code-property: #8be9fd;
-  --shiki-code-string: #f1fa8c;
-  --shiki-code-comment: #6272a4;
-  --shiki-code-value: #bd93f9;
-  --shiki-code-important: #ffb86c;
-  --shiki-code-punctuation: #f8f8f2;
+  --shiki-code-background: var(--code-background, #282a36);
+  --shiki-code-normal: var(--code-normal, #f8f8f2);
+  --shiki-code-keyword: var(--code-keyword, #ff79c6);
+  --shiki-code-function: var(--code-function, #50fa7b);
+  --shiki-code-property: var(--code-property, #8be9fd);
+  --shiki-code-string: var(--code-string, #f1fa8c);
+  --shiki-code-comment: var(--code-comment, #6272a4);
+  --shiki-code-value: var(--code-value, #bd93f9);
+  --shiki-code-important: var(--code-important, #ffb86c);
+  --shiki-code-punctuation: var(--code-punctuation, #f8f8f2);
 }
 
-/* Light mode fallback */
+/* Light mode - uses theme's --code-* variables with light fallbacks */
 .theme-light {
-  --shiki-code-background: #f8f8f2;
-  --shiki-code-normal: #282a36;
-  --shiki-code-keyword: #d63384;
-  --shiki-code-function: #28a745;
-  --shiki-code-property: #0d6efd;
-  --shiki-code-string: #fd7e14;
-  --shiki-code-comment: #6c757d;
-  --shiki-code-value: #6f42c1;
-  --shiki-code-important: #dc3545;
-  --shiki-code-punctuation: #282a36;
+  --shiki-code-background: var(--code-background, #f8f8f2);
+  --shiki-code-normal: var(--code-normal, #282a36);
+  --shiki-code-keyword: var(--code-keyword, #d63384);
+  --shiki-code-function: var(--code-function, #28a745);
+  --shiki-code-property: var(--code-property, #0d6efd);
+  --shiki-code-string: var(--code-string, #fd7e14);
+  --shiki-code-comment: var(--code-comment, #6c757d);
+  --shiki-code-value: var(--code-value, #6f42c1);
+  --shiki-code-important: var(--code-important, #dc3545);
+  --shiki-code-punctuation: var(--code-punctuation, #282a36);
 }
 
 /* ==========================================================================
